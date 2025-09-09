@@ -1,0 +1,66 @@
+{
+  "name": "calculadora-protecao-multipla",
+  "version": "1.0.0",
+  "description": "Calculadora avançada para estratégias de apostas com proteção múltipla",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "dev": "npx live-server",
+    "build": "echo 'Build não necessário - projeto estático'",
+    "test": "echo 'Testes ainda não implementados'",
+    "deploy": "gh-pages -d .",
+    "lint:js": "eslint js/**/*.js",
+    "lint:css": "stylelint css/**/*.css",
+    "format": "prettier --write js/**/*.js css/**/*.css *.html *.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/calculadora-protecao-multipla.git"
+  },
+  "keywords": [
+    "calculadora",
+    "apostas",
+    "estrategia",
+    "protecao",
+    "multipla",
+    "freebet",
+    "lay",
+    "back",
+    "betting",
+    "calculator",
+    "javascript",
+    "html5",
+    "css3"
+  ],
+  "author": {
+    "name": "Seu Nome",
+    "email": "seu-email@exemplo.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seu-usuario/calculadora-protecao-multipla/issues"
+  },
+  "homepage": "https://seu-usuario.github.io/calculadora-protecao-multipla",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "gh-pages": "^4.0.0",
+    "live-server": "^1.2.2",
+    "prettier": "^2.8.0",
+    "serve": "^14.0.0",
+    "stylelint": "^15.0.0",
+    "stylelint-config-standard": "^30.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "files": [
+    "index.html",
+    "css/",
+    "js/",
+    "README.md",
+    "LICENSE"
+  ]
+}
