@@ -2,10 +2,36 @@
  * Inicialização e configuração da calculadora
  */
 
+// Estado global da calculadora - deve ser definido antes de qualquer uso
+window.calculatorData = {
+  numProtecoes: 3,
+  rounding: 0.01,
+  multipla: { odd: 4.25, stake: 100, freebet: false },
+  protecoes: [
+    { odd: 1.95, isLay: true,  commission: 0 },
+    { odd: 2.80, isLay: false, commission: 2.5 },
+    { odd: 2.10, isLay: false, commission: 0 },
+    { odd: 3.20, isLay: false, commission: 0 },
+    { odd: 1.70, isLay: true,  commission: 0 },
+    { odd: 2.40, isLay: false, commission: 0 }
+  ],
+  freebetPercent: 70, // 0-100%
+  debugMode: false
+};
+
+// Alias para compatibilidade
+let calculatorData = window.calculatorData;
+
 /**
  * Inicializa a calculadora quando o DOM estiver carregado
  */
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Inicializando calculadora...');
+  console.log('calculatorData definido:', typeof calculatorData !== 'undefined');
+  
+  // Força limpeza das proteções (remove freebet se existir)
+  cleanupProtectionData();
+  
   // Carrega configuração compartilhada (se houver)
   loadSharedConfig();
   
@@ -28,7 +54,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Cálculo inicial
   updateCalculation();
+  
+  console.log('Calculadora inicializada com sucesso!');
 });
+
+/**
+ * Remove propriedades freebet das proteções (limpeza)
+ */
+function cleanupProtectionData() {
+  for (let i = 0; i < calculatorData.protecoes.length; i++) {
+    const p = calculatorData.protecoes[i];
+    if (p && p.hasOwnProperty('freebet')) {
+      delete p.freebet;
+    }
+  }
+  
+  if (calculatorData.debugMode) {
+    console.log('Limpeza das proteções concluída - freebets removidos');
+  }
+}
 
 /**
  * Configura event listeners para a múltipla
@@ -98,6 +142,10 @@ function setupOtherControls() {
   const forceRecalcBtn = document.getElementById('force-recalc');
   if (forceRecalcBtn) {
     forceRecalcBtn.addEventListener('click', () => {
+      if (calculatorData.debugMode) {
+        console.log('\n=== RECÁLCULO FORÇADO ===');
+        console.log('Estado atual das proteções:', JSON.stringify(calculatorData.protecoes.slice(0, calculatorData.numProtecoes), null, 2));
+      }
       scheduleRecalc(50); // Recálculo mais rápido
     });
   }

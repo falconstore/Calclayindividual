@@ -2,22 +2,7 @@
  * Lógica principal de cálculo da estratégia de proteção múltipla
  */
 
-// Estado global da calculadora
-let calculatorData = {
-  numProtecoes: 3,
-  rounding: 0.01,
-  multipla: { odd: 4.25, stake: 100, freebet: false },
-  protecoes: [
-    { odd: 1.95, isLay: true,  commission: 0,   freebet: true  },
-    { odd: 2.80, isLay: false, commission: 0,   freebet: false },
-    { odd: 2.10, isLay: false, commission: 0,   freebet: false },
-    { odd: 3.20, isLay: false, commission: 0,   freebet: false },
-    { odd: 1.70, isLay: true,  commission: 0,   freebet: false },
-    { odd: 2.40, isLay: false, commission: 0,   freebet: false }
-  ],
-  freebetPercent: 70, // 0-100%
-  debugMode: false
-};
+// calculatorData agora é definido em main.js para evitar problemas de ordem de carregamento
 
 /**
  * Calcula os stakes ótimos para equilibrar os lucros
@@ -54,8 +39,8 @@ function calculateOptimalStakes() {
         // Quando perde: ganha stake * commissionFactor
         // Para igualar multiplaNetProfit quando a proteção ganha:
         // multiplaNetProfit = stake * commissionFactor - stake * (odd - 1)
-        const netGainPerStake = commissionFactor - (p.odd - 1);
-        stake = netGainPerStake !== 0 ? multiplaNetProfit / netGainPerStake : 0;
+        const gainPerStake = commissionFactor; // LAY win = stake * (1 - comissão)
+        stake = gainPerStake > 0 ? multiplaNetProfit / gainPerStake : 0;
       }
     } else {
       // BACK
@@ -144,7 +129,7 @@ function calculateScenarioProfit(scenarioIndex) {
       }
     } else {
       if (p.isLay) {
-        profit += p.calculatedStake * commissionFactor - p.calculatedStake;
+        profit += p.calculatedStake * commissionFactor;
       } else {
         profit += p.calculatedStake * p.odd * commissionFactor - p.calculatedStake;
       }
@@ -163,7 +148,7 @@ function calculateScenarioProfit(scenarioIndex) {
       
       if (x.isLay) {
         // LAY ganha quando o evento não acontece
-        profit += x.calculatedStake * (1 - x.commission / 100) - x.calculatedStake;
+        profit -= x.calculatedStake * (x.odd - 1);
       } else {
         // BACK perde quando não acerta
         profit -= x.calculatedStake;
@@ -178,29 +163,43 @@ function calculateScenarioProfit(scenarioIndex) {
  * Atualiza todos os cálculos da calculadora
  */
 function updateCalculation() {
+  // Verifica consistência dos dados antes do cálculo
+  verifyProtectionData();
+  
   // Atualiza dados da múltipla
   const odd1El = document.getElementById('odd1');
   const stake1El = document.getElementById('stake1');
-  calculatorData.multipla.odd = parseDecimal(odd1El.value) || 0;
-  calculatorData.multipla.stake = parseDecimal(stake1El.value) || 0;
-  calculatorData.multipla.freebet = document.getElementById('freebet1').checked;
+  const freebet1El = document.getElementById('freebet1');
+  
+  if (odd1El) calculatorData.multipla.odd = parseDecimal(odd1El.value) || 0;
+  if (stake1El) calculatorData.multipla.stake = parseDecimal(stake1El.value) || 0;
+  if (freebet1El) calculatorData.multipla.freebet = freebet1El.checked;
 
   // Atualiza dados das proteções
   for (let i = 0; i < calculatorData.numProtecoes; i++) {
     const idx = i + 2;
     const p = calculatorData.protecoes[i];
+    
+    // Busca elementos apenas se existirem
     const oddEl = document.getElementById(`odd${idx}`);
     const commEl = document.getElementById(`commission${idx}`);
     const commCheck = document.getElementById(`comm${idx}`);
     const fbCheck = document.getElementById(`freebet${idx}`);
     
     if (oddEl) p.odd = parseDecimal(oddEl.value) || 0;
+    
     if (commCheck && commCheck.checked && commEl) {
       p.commission = parseDecimal(commEl.value) || 0;
     } else {
       p.commission = 0;
     }
+    
     if (fbCheck) p.freebet = fbCheck.checked;
+    
+    // Debug: log mudanças críticas
+    if (calculatorData.debugMode) {
+      console.log(`Proteção ${i+1}: isLay=${p.isLay}, odd=${p.odd}, commission=${p.commission}, freebet=${p.freebet}`);
+    }
   }
 
   calculateOptimalStakes();

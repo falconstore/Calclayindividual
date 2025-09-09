@@ -108,7 +108,90 @@ function renderProtecoes() {
 
   // Adiciona event listeners
   attachProtecaoEventListeners(n);
+  
+  // Força sincronização do estado dos botões
+  syncButtonStates(n);
+  
   scheduleRecalc();
+}
+
+/**
+ * Sincroniza o estado visual dos botões com os dados
+ * @param {number} n - Número de proteções
+ */
+function syncButtonStates(n) {
+  for (let i = 0; i < n; i++) {
+    const idx = i + 2;
+    const p = calculatorData.protecoes[i];
+    
+    // Sincroniza botões BACK/LAY
+    const backBtn = document.querySelector(`[data-type="BACK"][data-index="${idx}"]`);
+    const layBtn = document.querySelector(`[data-type="LAY"][data-index="${idx}"]`);
+    const respField = document.getElementById(`resp-field${idx}`);
+    
+    if (backBtn && layBtn) {
+      backBtn.classList.remove('active');
+      layBtn.classList.remove('active');
+      
+      if (p.isLay) {
+        layBtn.classList.add('active');
+        if (respField) respField.style.display = 'block';
+      } else {
+        backBtn.classList.add('active');
+        if (respField) respField.style.display = 'none';
+      }
+    }
+    
+    // Sincroniza campos de comissão
+    const commCheck = document.getElementById(`comm${idx}`);
+    const commField = document.getElementById(`comm-field${idx}`);
+    const commInput = document.getElementById(`commission${idx}`);
+    
+    if (commCheck && commField) {
+      commCheck.checked = p.commission > 0;
+      commField.style.display = p.commission > 0 ? 'block' : 'none';
+      if (commInput) commInput.value = formatDecimal(p.commission);
+    }
+    
+    // Sincroniza freebet
+    const fbCheck = document.getElementById(`freebet${idx}`);
+    if (fbCheck) {
+      fbCheck.checked = p.freebet;
+    }
+  }
+}
+
+/**
+ * Força verificação e sincronização dos dados das proteções
+ */
+function verifyProtectionData() {
+  for (let i = 0; i < calculatorData.numProtecoes; i++) {
+    const idx = i + 2;
+    const p = calculatorData.protecoes[i];
+    
+    // Verifica se os botões estão consistentes com os dados
+    const backBtn = document.querySelector(`[data-type="BACK"][data-index="${idx}"]`);
+    const layBtn = document.querySelector(`[data-type="LAY"][data-index="${idx}"]`);
+    
+    if (backBtn && layBtn) {
+      const backActive = backBtn.classList.contains('active');
+      const layActive = layBtn.classList.contains('active');
+      
+      // Se há inconsistência, corrige baseado nos dados
+      if ((p.isLay && backActive) || (!p.isLay && layActive)) {
+        if (calculatorData.debugMode) {
+          console.warn(`Inconsistência detectada na proteção ${i+1}. Corrigindo...`);
+        }
+        syncButtonStates(calculatorData.numProtecoes);
+      }
+    }
+    
+    // Verifica campos obrigatórios
+    const oddEl = document.getElementById(`odd${idx}`);
+    if (oddEl && oddEl.value !== formatDecimal(p.odd)) {
+      p.odd = parseDecimal(oddEl.value) || 0;
+    }
+  }
 }
 
 /**
@@ -265,13 +348,12 @@ function updateResultsTable() {
       </td>
     </tr>`;
 
-  // Cenários: Proteções vencem
+  // Cenários: Proteções vencem (SEM freebet)
   for (let i = 0; i < calculatorData.numProtecoes; i++) {
     const p = protecoes[i];
     const profit = calculateScenarioProfit(i + 1);
     const typeColor = p.isLay ? 'var(--primary)' : 'var(--success)';
     const typeText = p.isLay ? 'LAY' : 'BACK';
-    const freebetText = p.freebet ? '<br><span class="text-small">(Freebet)</span>' : '';
     const commissionText = p.commission > 0 ? 
       `<br><span class="text-small">(${formatDecimal(p.commission)}%)</span>` : '';
     
@@ -280,7 +362,7 @@ function updateResultsTable() {
         <td><strong>Proteção ${i + 1} Vence</strong></td>
         <td>${formatDecimal(p.odd)}</td>
         <td><span style="color:${typeColor};">${typeText}</span>${commissionText}</td>
-        <td><strong>${formatCurrency(p.calculatedStake || 0)}</strong>${freebetText}</td>
+        <td><strong>${formatCurrency(p.calculatedStake || 0)}</strong></td>
         <td class="${profit >= 0 ? 'profit-positive' : 'profit-negative'}">
           <strong>${profit >= 0 ? '+' : ''}${formatCurrency(Math.abs(profit))}</strong>
         </td>
@@ -292,11 +374,30 @@ function updateResultsTable() {
 
 /**
  * Atualiza número de proteções
- * @param {string} val - Novo número de proteções
+ * @param {string|number} val - Novo número de proteções
  */
 function updateEntradas(val) {
-  calculatorData.numProtecoes = parseInt(val) || 2;
-  renderProtecoes();
+  try {
+    const newNum = parseInt(val) || 2;
+    const oldNum = calculatorData.numProtecoes;
+    
+    console.log(`updateEntradas chamada: ${oldNum} → ${newNum}`);
+    
+    calculatorData.numProtecoes = newNum;
+    
+    if (calculatorData.debugMode) {
+      console.log(`Mudando de ${oldNum} para ${newNum} proteções`);
+    }
+    
+    // Força re-renderização completa
+    renderProtecoes();
+    
+    console.log('Proteções atualizadas com sucesso');
+    
+  } catch (error) {
+    console.error('Erro em updateEntradas:', error);
+    console.log('calculatorData existe?', typeof window.calculatorData !== 'undefined');
+  }
 }
 
 /**
