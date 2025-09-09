@@ -1,0 +1,55 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "script"
+  },
+  "globals": {
+    "calculatorData": "writable",
+    "parseDecimal": "readonly",
+    "formatCurrency": "readonly",
+    "formatDecimal": "readonly",
+    "roundToStep": "readonly",
+    "showStatus": "readonly",
+    "hideStatus": "readonly",
+    "toggleTheme": "readonly",
+    "calculateOptimalStakes": "readonly",
+    "calculateScenarioProfit": "readonly",
+    "updateCalculation": "readonly",
+    "updateDebugInfo": "readonly",
+    "scheduleRecalc": "readonly",
+    "renderProtecoes": "readonly",
+    "updateUI": "readonly",
+    "updateEntradas": "readonly",
+    "updateRounding": "readonly",
+    "shareCalculation": "readonly",
+    "loadSharedConfig": "readonly"
+  },
+  "rules": {
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "no-unused-vars": ["warn"],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "prefer-const": ["error"],
+    "no-var": ["error"],
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "all"],
+    "brace-style": ["error", "1tbs"],
+    "comma-dangle": ["error", "never"],
+    "no-trailing-spaces": ["error"],
+    "eol-last": ["error", "always"],
+    "space-before-function-paren": ["error", "never"],
+    "keyword-spacing": ["error"],
+    "space-infix-ops": ["error"],
+    "object-curly-spacing": ["error", "always"],
+    "array-bracket-spacing": ["error", "never"]
+  }
+}
