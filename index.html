@@ -8,17 +8,18 @@
 </head>
 <body>
   <button class="theme-toggle" onclick="toggleTheme()">🌙 Tema Escuro</button>
+
   <div class="container">
     <div class="calc-header">
       <h1>Calculadora de Proteção Múltipla</h1>
-      <p>Equilibre lucros com freebets e minimize perdas em suas proteções</p>
+      <p>Equalize lucros com Freebet (ou sem) em 2..N proteções (BACK/LAY, comissões).</p>
     </div>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Configurações</div>
-        <div class="form-group" style="margin:.75rem 0 0 0;">
-          <select id="select-protecoes" class="form-select" style="font-size:.75rem;padding:.5rem;" onchange="updateEntradas(this.value)">
+        <div class="stat-label">Proteções</div>
+        <div class="form-group">
+          <select id="select-protecoes" class="form-select">
             <option value="2">2 Proteções</option>
             <option value="3" selected>3 Proteções</option>
             <option value="4">4 Proteções</option>
@@ -30,8 +31,8 @@
 
       <div class="stat-card">
         <div class="stat-label">Arredondamento</div>
-        <div class="form-group" style="margin:.75rem 0 0 0;">
-          <select id="select-round" class="form-select" style="font-size:.75rem;padding:.5rem;" onchange="updateRounding(this.value)">
+        <div class="form-group">
+          <select id="select-round" class="form-select">
             <option value="0.01" selected>R$ 0,01</option>
             <option value="0.10">R$ 0,10</option>
             <option value="0.50">R$ 0,50</option>
@@ -41,18 +42,8 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-value" id="totalInvestment">R$ 0,00</div>
-        <div class="stat-label">Total Proteção</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-value profit-highlight" id="minProfit">+R$ 0,00</div>
-        <div class="stat-label">Lucro Mínimo</div>
-      </div>
-
-      <div class="stat-card">
         <div class="stat-label">Freebet %</div>
-        <div class="form-group" style="margin:.5rem 0 0 0; display:flex; align-items:center; gap:.5rem; justify-content:center;">
+        <div class="form-group" style="display:flex;align-items:center;gap:.5rem;justify-content:center;">
           <button id="fb-dec" class="btn btn-secondary" style="min-width:2.25rem;">−</button>
           <strong id="freebet-percent" class="stat-value" style="margin:0;">70%</strong>
           <button id="fb-inc" class="btn btn-secondary" style="min-width:2.25rem;">+</button>
@@ -61,79 +52,59 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-label">Recalcular</div>
-        <button id="force-recalc" class="btn btn-primary" style="width:100%; background: linear-gradient(135deg, var(--secondary), #16a34a);">
-          ⚡ Forçar Recálculo
-        </button>
+        <div class="stat-label">Total Proteção</div>
+        <div class="stat-value" id="totalInvestment">R$ 0,00</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-label">Compartilhar</div>
-        <button class="btn-share-card" onclick="shareCalculation()">🔗 Compartilhar</button>
+        <div class="stat-label">Meta Proteção</div>
+        <div class="stat-value" id="meta-protecao">R$ 0,00</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Lucro Múltipla</div>
+        <div class="stat-value profit-highlight" id="meta-multipla">R$ 0,00</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Recalcular</div>
+        <button id="force-recalc" class="btn btn-primary">⚡ Forçar Recálculo</button>
       </div>
     </div>
 
-    <div id="calculation-status" style="display:none;margin:.75rem 0;padding:.75rem 1rem;border:2px solid #16a34a;border-radius:8px;background:rgba(34,197,94,.08);color:#86efac;font-weight:700;">
+    <div id="calculation-status" style="display:none;margin:.75rem 0;padding:.5rem .75rem;border-radius:8px;border:1px solid var(--success);background:rgba(34,197,94,.08);color:#86efac;font-weight:700;">
       Recalculando...
     </div>
 
     <div class="card">
-      <div class="section-title">Entradas da Calculadora</div>
+      <div class="section-title">Entradas</div>
       <div id="entradas-container" class="house-grid">
         <div class="house-card multipla">
           <div class="badge badge-multipla">🎯 Múltipla</div>
           <h3 class="house-title">Odd Principal (Múltipla)</h3>
           <div class="form-group">
             <label class="form-label">Odd da Múltipla</label>
-            <input class="form-input" id="odd1" value="4.25" placeholder="ex: 4.25" />
+            <input class="form-input" id="odd1" value="9.00" placeholder="ex: 4.25" />
           </div>
           <div class="form-group">
             <label class="form-label">Stake da Múltipla</label>
             <div style="position:relative;">
               <span style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:600;font-size:.75rem;">R$</span>
-              <input class="form-input" id="stake1" style="padding-left:2.25rem;font-family:ui-monospace,monospace;" value="100.00" placeholder="100.00" />
+              <input class="form-input" id="stake1" style="padding-left:2rem;font-family:ui-monospace,monospace;" value="30.00" placeholder="100.00" />
             </div>
           </div>
           <div style="display:flex;gap:.75rem;margin:.75rem 0;flex-wrap:wrap;">
             <label class="checkbox-group">
-              <input type="checkbox" id="freebet1" />
+              <input type="checkbox" id="freebet1" checked />
               <span>Freebet</span>
             </label>
           </div>
-          <div style="padding:.75rem;background:rgba(245,158,11,.1);border-radius:8px;border:1px solid var(--warning);margin-top:.75rem;">
-            <div style="font-size:.75rem;color:var(--warning);font-weight:600;">💡 Aposta principal — sem comissão e sempre BACK</div>
+          <div style="padding:.75rem;background:rgba(245,158,11,.08);border-radius:8px;border:1px solid var(--warning);margin-top:.75rem;">
+            <div class="text-small">Dica: Com Freebet ativa, a meta por proteção é <strong>r × F</strong> (ex.: 70% de 30 = R$21,00).</div>
           </div>
         </div>
 
         <div id="protecoes-list"></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:1.5rem;">
-      <div class="section-title">Análise dos Cenários</div>
-      <div style="overflow-x:auto;">
-        <table class="results-table">
-          <thead>
-            <tr>
-              <th>Cenário</th>
-              <th>Odd</th>
-              <th>Tipo</th>
-              <th>Stake</th>
-              <th>Lucro Final</th>
-            </tr>
-          </thead>
-          <tbody id="results-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card" style="background:rgba(59,130,246,.1);border-color:var(--primary);">
-      <div class="section-title" style="color:var(--primary);">🎯 Como Funciona a Estratégia</div>
-      <div style="color:var(--text-secondary);line-height:1.6;">
-        <p style="margin-bottom:1rem;"><strong>1. Múltipla Principal:</strong> Aposta com odd alta (pode ser freebet).</p>
-        <p style="margin-bottom:1rem;"><strong>2. Proteções:</strong> Entradas que equilibram os resultados.</p>
-        <p style="margin-bottom:1rem;"><strong>3. Freebets:</strong> Maximizam o lucro sem risco adicional.</p>
-        <p><strong>4. Resultado:</strong> Lucro protegido em múltiplos cenários.</p>
       </div>
     </div>
 
